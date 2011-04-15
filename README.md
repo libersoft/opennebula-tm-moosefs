@@ -13,30 +13,32 @@ Installation
 Requisites:
 * a MooseFS storage mounted on every nebula host under the same folder (ex: /srv/vms);
 
-oned.conf:
-    VM_DIR=/srv/vms/deploy
+Edit oned.conf accordingly:
+    `VM_DIR=/srv/vms/deploy
     IMAGE_REPOSITORY_PATH = /srv/vms/images
     TM_MAD = [
         name       = "tm_moosefs",
         executable = "one_tm",
-        arguments  = "tm_moosefs/tm_moosefs.conf" ]
+        arguments  = "tm_moosefs/tm_moosefs.conf" ]`
 
 Copy `tm_moosefs` in `/etc/one` or `$ONE-LOCATION/etc`
 Copy `tm_commands/moosefs` in `/usr/lib/one/tm_commands`
 
 Configure nebula host to use the new transfer manager:
-    onehost create host01 im_kvm vmm_kvm tm_moosefs
+    `onehost create host01 im_kvm vmm_kvm tm_moosefs`
 
 Extra Hacks
 -----------
 
-If you mv your `/var/lib/one` inside moosefs (ex: `/srv/vms/one`) and symlink it back, you can easily achieve database replication with sqlite for easy frontend migration.
+If you move your `/var/lib/one` inside moosefs (ex: `/srv/vms/one`) and symlink it back, you can easily achieve database replication with sqlite for easy frontend migration.
 
 Contact 
 -------
 
 LiberSoft: http://www.libersoft.it
+
 OpenNebula: http://opennebula.org
+
 MooseFS: http://www.moosefs.org
 
 License 
