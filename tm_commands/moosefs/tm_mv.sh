@@ -28,5 +28,19 @@ fi
 
 . $TMCOMMON
 
-log "Will not move, using a shared filesystem"
+SRC_PATH=`arg_path $SRC`
+DST_PATH=`arg_path $DST`
 
+if [ "$SRC_PATH" == "$DST_PATH" ]; then
+    log "Will not move, source and destination are equal"
+else
+    if [ -d "$SRC_PATH" ]; then
+        log "Will not move, is not saving image"
+    else
+        DST_DIR=`dirname $DST_PATH`
+        log "Moving $SRC_PATH to $DST_PATH"
+        exec_and_log "mkdir -p $DST_DIR"
+        exec_and_log "mfsmakesnapshot -o $SRC_PATH $DST_PATH"
+        exec_and_log "rm -rf $SRC_PATH"
+    fi
+fi
