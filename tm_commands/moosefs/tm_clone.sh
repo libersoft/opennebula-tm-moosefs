@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
-# Copyright 2011, LiberSoft (libersoft.it)                                   #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -28,26 +27,33 @@ fi
 
 . $TMCOMMON
 
+get_vmdir
+
 SRC_PATH=`arg_path $SRC`
 DST_PATH=`arg_path $DST`
 
-log "$1 $2"
-log "DST: $DST_PATH"
+fix_paths
+
+log_debug "$1 $2"
+log_debug "DST: $DST_PATH"
 
 DST_DIR=`dirname $DST_PATH`
 
 log "Creating directory $DST_DIR"
 exec_and_log "mkdir -p $DST_DIR"
+exec_and_log "chmod a+w $DST_DIR"
 
 case $SRC in
 http://*)
     log "Downloading $SRC"
-    exec_and_log "$WGET -O $DST_PATH $SRC"
+    exec_and_log "$WGET -O $DST_PATH $SRC" \
+        "Error downloading $SRC"
     ;;
 
 *)
-    log "Cloning $SRC"
-    exec_and_log "mfsmakesnapshot -o $SRC_PATH $DST_PATH"
+    log "Cloning $SRC_PATH"
+    exec_and_log "mfsmakesnapshot -o $SRC_PATH $DST_PATH" \
+        "Error copying $SRC to $DST"
     ;;
 esac
 

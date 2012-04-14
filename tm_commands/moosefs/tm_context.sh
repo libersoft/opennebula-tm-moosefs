@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -25,7 +25,6 @@ while (( "$#" )); do
     shift
 done
 
-
 if [ -z "${ONE_LOCATION}" ]; then
     TMCOMMON=/usr/lib/one/mads/tm_common.sh
 else
@@ -34,34 +33,32 @@ fi
 
 . $TMCOMMON
 
+get_vmdir
 
 DST_PATH=`arg_path $DST`
-DST_DIR=`dirname $DST_PATH`
-DST_FILE=`basename $DST_PATH`
-DST_HASH=`echo -n $DST | $MD5SUM | $AWK '{print $1}'`
-if [ -z "$ONE_LOCATION" ]; then
-       TMP_DIR="/var/lib/one/$DST_HASH"
-else
-       TMP_DIR="$ONE_LOCATION/var/$DST_HASH"
-fi
-ISO_DIR="$TMP_DIR/isofiles"
 
+fix_dst_path
+
+DST_DIR=`dirname $DST_PATH`
+ISO_DIR=$DST_DIR/isofiles
 
 exec_and_log "mkdir -p $ISO_DIR"
 
 for f in $SRC; do
     case $f in
     http://*)
-        exec_and_log "$WGET -O $ISO_DIR $f"
+        exec_and_log "$WGET -P $ISO_DIR $f" \
+            "Error downloading $f"
         ;;
 
     *)
-        exec_and_log "cp -R $f $ISO_DIR"
+        exec_and_log "mfsmakesnapshot -o $f $ISO_DIR" \
+            "Error copying $f to $ISO_DIR"
         ;;
     esac
 done
 
-exec_and_log "$MKISOFS -o $TMP_DIR/$DST_FILE -J -R $ISO_DIR"
-exec_and_log "$SCP $TMP_DIR/$DST_FILE $DST"
-exec_and_log "rm -rf $TMP_DIR"
+exec_and_log "$MKISOFS -o $DST_PATH -J -R $ISO_DIR" \
+    "Error creating iso fs"
 
+exec_and_log "rm -rf $ISO_DIR"

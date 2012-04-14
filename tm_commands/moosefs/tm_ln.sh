@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
-# Copyright 2011, LiberSoft (libersoft.it)                                   #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -22,20 +21,26 @@ DST=$2
 
 if [ -z "${ONE_LOCATION}" ]; then
     TMCOMMON=/usr/lib/one/mads/tm_common.sh
-    TM_COMMANDS_LOCATION=/usr/lib/one/tm_commands/ 
 else
     TMCOMMON=$ONE_LOCATION/lib/mads/tm_common.sh
-    TM_COMMANDS_LOCATION=$ONE_LOCATION/lib/tm_commands/
 fi
 
 . $TMCOMMON
 
+get_vmdir
+
 SRC_PATH=`arg_path $SRC`
 DST_PATH=`arg_path $DST`
+
+fix_dst_path
 
 DST_DIR=`dirname $DST_PATH`
 
 log "Creating directory $DST_DIR"
-exec_and_log "mkdir -p $DST_DIR"
+exec_and_log "mkdir -p $DST_DIR" \
+    "Could not create directory $DST_DIR"
+exec_and_log "chmod a+w $DST_DIR"
 
+log "Link $SRC_PATH"
 exec_and_log "ln -s $SRC_PATH $DST_PATH"
+
